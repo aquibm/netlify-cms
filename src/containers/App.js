@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
-import { IndexLink } from "react-router";
+import { Route, Switch, Link } from 'react-router-dom';
 import FontIcon from 'react-toolbox/lib/font_icon';
 import { Navigation } from 'react-toolbox/lib/navigation';
 import { Notifs } from 'redux-notifications';
@@ -21,6 +21,11 @@ import AppHeader from '../components/AppHeader/AppHeader';
 import { Loader, Toast } from '../components/UI/index';
 import { getCollectionUrl, getNewEntryUrl } from '../lib/urlHelper';
 import { SIMPLE, EDITORIAL_WORKFLOW } from '../constants/publishModes';
+import DashboardPage from '../containers/DashboardPage';
+import CollectionPage from '../containers/CollectionPage';
+import EntryPage from '../containers/EntryPage';
+import SearchPage from '../containers/SearchPage';
+import NotFoundPage from '../containers/NotFoundPage';
 import styles from './App.css';
 import sidebarStyles from './Sidebar.css';
 
@@ -38,7 +43,6 @@ class App extends React.Component {
 
   static propTypes = {
     auth: ImmutablePropTypes.map,
-    children: PropTypes.node,
     config: ImmutablePropTypes.map,
     collections: ImmutablePropTypes.orderedMap,
     createNewEntryInCollection: PropTypes.func.isRequired,
@@ -104,7 +108,6 @@ class App extends React.Component {
     const {
       user,
       config,
-      children,
       collections,
       toggleSidebar,
       runCommand,
@@ -140,7 +143,7 @@ class App extends React.Component {
             <section>
               <h1 className={sidebarStyles.heading}>Publishing</h1>
               <div className={sidebarStyles.linkWrapper}>
-                <IndexLink to="/" className={sidebarStyles.viewEntriesLink}>Editorial Workflow</IndexLink>
+                <Link to="/" className={sidebarStyles.viewEntriesLink}>Editorial Workflow</Link>
               </div>
             </section>
           }
@@ -193,7 +196,33 @@ class App extends React.Component {
           <div className={styles.entriesPanel}>
             { isFetching && <TopBarProgress /> }
             <div>
-              {children}
+              <Switch>
+                <Route
+                  path='/' exact 
+                  component={DashboardPage}
+                />
+                <Route
+                  path="/collections/:name"
+                  component={CollectionPage}
+                />
+                <Route
+                  path="/collections/:name/entries/new"
+                  component={EntryPage}
+                  newRecord
+                />
+                <Route
+                  path="/collections/:name/entries/:slug"
+                  component={EntryPage}
+                />
+                <Route
+                  path="/search/:searchTerm"
+                  component={SearchPage}
+                />
+                <Route
+                  path="*"
+                  component={NotFoundPage}
+                />
+              </Switch>
             </div>
           </div>
         </div>
